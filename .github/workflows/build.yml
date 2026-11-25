@@ -1,0 +1,79 @@
+name: Build APK and Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew || true
+
+      - name: Create Gradle Wrapper if missing
+        run: |
+          if [ ! -f gradlew ]; then
+            gradle wrapper --gradle-version 8.9
+          fi
+          chmod +x gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Find APK
+        id: find_apk
+        run: |
+          APK_PATH=$(find app/build/outputs/apk -name "*.apk" | head -n 1)
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+          echo "Found APK: $APK_PATH"
+          ls -la app/build/outputs/apk/debug/ || true
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NightKiev-CS-Monitor-debug
+          path: ${{ steps.find_apk.outputs.apk_path }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: Release v1.0.0
+          body: |
+            ## Нічний Київ | Монітор v1.0.0
+
+            Android-додаток для моніторингу CS 1.6 сервера.
+
+            **За замовчуванням:** 91.211.118.84:27035
+
+            ### Можливості
+            - A2S_INFO (UDP) пінг
+            - Foreground Service
+            - Сповіщення при зміні статусу
+            - Автозапуск після перезавантаження
+            - Український інтерфейс (Jetpack Compose)
+
+            ### Встановлення
+            Скачайте APK нижче та встановіть (дозвольте встановлення з невідомих джерел).
+          files: ${{ steps.find_apk.outputs.apk_path }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
