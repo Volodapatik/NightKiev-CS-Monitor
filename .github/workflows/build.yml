@@ -21,21 +21,24 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew || true
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses || true
 
-      - name: Create Gradle Wrapper if missing
+      - name: Generate Gradle Wrapper
         run: |
-          if [ ! -f gradlew ]; then
-            gradle wrapper --gradle-version 8.9
-          fi
+          gradle wrapper --gradle-version 8.9
           chmod +x gradlew
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleDebug --stacktrace --no-daemon
 
       - name: Find APK
         id: find_apk
@@ -43,7 +46,7 @@ jobs:
           APK_PATH=$(find app/build/outputs/apk -name "*.apk" | head -n 1)
           echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
           echo "Found APK: $APK_PATH"
-          ls -la app/build/outputs/apk/debug/ || true
+          ls -laR app/build/outputs/apk/ || true
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -66,9 +69,10 @@ jobs:
             ### Можливості
             - A2S_INFO (UDP) пінг
             - Foreground Service
-            - Сповіщення при зміні статусу
+            - Сповіщення при зміні статусу (звук + вібрація)
+            - Анти-спам (3 спроби)
             - Автозапуск після перезавантаження
-            - Український інтерфейс (Jetpack Compose)
+            - Український інтерфейс (Jetpack Compose + Material 3)
 
             ### Встановлення
             Скачайте APK нижче та встановіть (дозвольте встановлення з невідомих джерел).
