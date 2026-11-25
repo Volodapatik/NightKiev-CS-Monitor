@@ -74,7 +74,6 @@ class MonitorService : Service() {
             if (consecutiveFails >= prefs.maxAttempts) {
                 handleStatusChange(false, info)
             }
-            // else keep previous status (anti-spam)
         }
     }
 
@@ -95,8 +94,6 @@ class MonitorService : Service() {
             }
         } else if (previous == null) {
             prefs.addLog(if (online) "Старт: Онлайн (${info.mapName})" else "Старт: Офлайн")
-        } else if (online) {
-            // just update log occasionally? skip to avoid spam
         }
     }
 
@@ -170,7 +167,7 @@ class MonitorService : Service() {
                 vm.defaultVibrator
             } else {
                 @Suppress("DEPRECATION")
-                getSystemService(VIBRATOR_SERVICE) as Vibrator
+                getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 vibrator.vibrate(VibrationEffect.createOneShot(400, VibrationEffect.DEFAULT_AMPLITUDE))
