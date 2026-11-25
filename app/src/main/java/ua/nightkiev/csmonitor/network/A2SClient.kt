@@ -7,8 +7,6 @@ import ua.nightkiev.csmonitor.data.ServerInfo
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.nio.charset.Charset
 
 class A2SClient(
@@ -89,9 +87,9 @@ class A2SClient(
         offset = readString(data, offset, length).second
         // appid short
         offset += 2
-        val players = data[offset].toInt() and 0xFF
+        val players = data.getOrElse(offset) { 0 }.toInt() and 0xFF
         offset++
-        val maxPlayers = data[offset].toInt() and 0xFF
+        val maxPlayers = data.getOrElse(offset) { 0 }.toInt() and 0xFF
 
         return ServerInfo(
             isOnline = true,
@@ -112,9 +110,9 @@ class A2SClient(
         offset = readString(data, offset, length).second
         // game
         offset = readString(data, offset, length).second
-        val players = data[offset].toInt() and 0xFF
+        val players = data.getOrElse(offset) { 0 }.toInt() and 0xFF
         offset++
-        val maxPlayers = data[offset].toInt() and 0xFF
+        val maxPlayers = data.getOrElse(offset) { 0 }.toInt() and 0xFF
 
         return ServerInfo(
             isOnline = true,
