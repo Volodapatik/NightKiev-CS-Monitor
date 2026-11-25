@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Нічний Київ | Монітор</string>
+    <string name="monitoring_active">Моніторинг CS 1.6 активний. Статус: %1$s</string>
+    <string name="status_online">Онлайн</string>
+    <string name="status_offline">Офлайн</string>
+    <string name="notification_offline">🔴 Сервер тимчасово не відповідає</string>
+    <string name="notification_online">🟢 Сервер знову онлайн</string>
+    <string name="channel_name">Моніторинг сервера</string>
+    <string name="channel_description">Сповіщення про зміну статусу CS 1.6 сервера</string>
+</resources>
